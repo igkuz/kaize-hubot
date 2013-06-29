@@ -44,7 +44,7 @@ module.exports = (robot) ->
         else
           robot.logger.error util.inspect res.statusCode, res.headers
 
-  robot.respond /video (stop|play|pause|next)/i, (msg) ->
+  robot.respond /video (stop|play|pause|next|mute|unmute)/i, (msg) ->
     command = msg.match[1]
 
     send_request(msg, backend_url + command, "#{command} sended to video player")
