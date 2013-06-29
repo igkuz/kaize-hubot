@@ -4,6 +4,7 @@
 # Commands:
 #   hubot show big boobs - Display boobs in fullscreen mode
 #   hubot friday mode on - Display boobs in default square widgets
+#   hubot show boobs - Display boobs in default square widgets
 #   hubot hide boobs - Hide boobs
 #   hubot hide big boobs - Changes display from fullscreen mode to deault mode
 
