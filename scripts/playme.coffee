@@ -10,8 +10,6 @@
 util = require 'util'
 
 module.exports = (robot) ->
-  robot.follow_http = require('follow-redirects').http
-
   unless process.env.HUBOT_CI_URL?
     robot.logger.error "The HUBOT_CI_URL must be specified"
     return
