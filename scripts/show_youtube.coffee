@@ -2,12 +2,12 @@
 #   Sends given url to CI Api to show it on
 #
 # Commands:
-#   hubot video show <url> - Opens the given url on CI Widget
+#   hubot show video <url> - Opens the given url on CI Widget
 util = require 'util'
 
 
 module.exports = (robot) ->
-  robot.respond /video show (.*)/i, (msg) ->
+  robot.respond /show video (.*)/i, (msg) ->
     param = msg.match[1]
     url = 'http://192.168.30.14:3030/api/youtube/show'
 
