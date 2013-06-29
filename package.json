@@ -25,7 +25,8 @@
 
   "dependencies": {
     "hubot":         "2.5.5",
-    "hubot-scripts": "2.4.6"
+    "hubot-scripts": "2.4.6",
+    "hubot-skype": "git://github.com/netpro2k/hubot-skype.git"
   },
 
   "engines": {
