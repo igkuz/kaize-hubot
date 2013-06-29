@@ -31,5 +31,5 @@ module.exports = (robot) ->
   robot.respond /hide boobs/i, (msg) ->
     send_request(msg, "Party ended, see you next friday!", 'default')
 
-  robot.respond /friday mode on/i, (msg) ->
+  robot.respond /(friday mode on|show boobs)?/i, (msg) ->
     send_request(msg, "It's party time!!! Welcome BOOOOOOOBS!!!", 'friday')
