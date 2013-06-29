@@ -53,8 +53,6 @@ module.exports = (robot) ->
 
 
   test_poiskm_tracks = (tracks, msg, position, callback) ->
-    msg.send "Test #{position}"
-
     if !tracks || !tracks[position]
       msg.send "Song not found"
       return
@@ -62,8 +60,6 @@ module.exports = (robot) ->
     track = tracks[position]
     song_url = track.replace(/download=download/, 'download')
     song_url = song_url.replace(new RegExp(song_url[6], 'g'), '/')
-
-    msg.send song_url
 
     test_url = (song_url, msg, callback) ->
       robot.http(song_url).head() (err, res, body) ->
