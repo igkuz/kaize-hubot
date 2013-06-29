@@ -20,7 +20,6 @@ module.exports = (robot) ->
       return
     else
       url = 'http://' + process.env.HUBOT_CI_URL + '/api/pic/show'
-      msg.send Util.inspect url
 
     msg.http(url)
       .query({url: msg.match[1]})

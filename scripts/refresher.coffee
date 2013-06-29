@@ -20,7 +20,6 @@ module.exports = (robot) ->
       return
     else
       url = 'http://' + process.env.HUBOT_CI_URL + '/api/refresher/refresh'
-      msg.send Util.inspect url
 
     msg.http(url)
       .get() (err, res, body) ->
