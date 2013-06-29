@@ -7,6 +7,12 @@ util = require 'util'
 
 module.exports = (robot) ->
 
+  unless process.env.HUBOT_CI_URL?
+    robot.logger.error "The HUBOT_CI_URL must be specified"
+    return
+  else
+    global.backend_url = 'http://' + process.env.HUBOT_CI_URL + '/api'
+
   play = (query, msg) ->
     robot.http("http://tracksflow.com/2.0/api/tracks")
       .query(
@@ -31,8 +37,7 @@ module.exports = (robot) ->
             body = JSON.parse(body)
             song_url = body["url"]
 
-            backend_url = "http://192.168.30.197:3030/api/player/play"
-            robot.http(backend_url)
+            robot.http(global.backend_url + "/player/play")
               .query({url: song_url})
               .get() (err, res, body) ->
                 status = res.statusCode
@@ -42,8 +47,7 @@ module.exports = (robot) ->
                   msg.send util.inspect res.statusCode, res.headers
 
   stop = (msg) ->
-    backend_url = "http://192.168.30.197:3030/api/player/stop"
-    robot.http(backend_url)
+    robot.http(global.backend_url + "/player/stop")
       .get() (err, res, body) ->
         status = res.statusCode
         if status == 200
