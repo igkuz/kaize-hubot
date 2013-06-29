@@ -13,7 +13,7 @@ module.exports = (robot) ->
   else
     global.backend_url = 'http://' + process.env.HUBOT_CI_URL + '/api'
 
-  play = (query, msg) ->
+  find_track_in_trackflow = (query, msg) ->
     robot.http("http://tracksflow.com/2.0/api/tracks")
       .query(
         for: query
@@ -31,20 +31,52 @@ module.exports = (robot) ->
           .get() (err, res, body) ->
             status = res.statusCode
             if status != 200
-              msg.send "Song not found"
-              return
+              return null
 
             body = JSON.parse(body)
             song_url = body["url"]
+            return song_url
 
-            robot.http(global.backend_url + "/player/play")
-              .query({url: song_url})
-              .get() (err, res, body) ->
-                status = res.statusCode
-                if status == 200
-                  msg.send "Opening #{song_url}"
-                else
-                  msg.send util.inspect res.statusCode, res.headers
+  find_track_in_poiskm = (query, msg, callback) ->
+    robot.http("http://poiskm.com/")
+      .query(
+        q: query
+        c: 'search'
+      )
+      .get() (err, res, body) ->
+        tracks = body.match(/("([^"]+download=download.mp3)+")/i)
+
+        if !tracks
+          msg.send "Song not found"
+          return
+
+        track = tracks[2]
+
+        song_url = track.replace(/download=download/, 'download')
+        song_url = song_url.replace(new RegExp(song_url[6], 'g'), '/')
+        callback(song_url, msg)
+
+
+  play = (query, msg) ->
+    song_url = find_track_in_poiskm(query, msg, play_by_url)
+
+    #if !song_url
+      #song_url = find_track_in_trackflow(query, msg, play_by_url)
+
+
+  play_by_url = (song_url, msg) ->
+    if !song_url
+      msg.send "Song not found"
+      return
+
+    robot.http(global.backend_url + "/player/play")
+      .query({url: song_url})
+      .get() (err, res, body) ->
+        status = res.statusCode
+        if status == 200
+          msg.send "Opening #{song_url}"
+        else
+          msg.send util.inspect res.statusCode, res.headers
 
   stop = (msg) ->
     robot.http(global.backend_url + "/player/stop")
