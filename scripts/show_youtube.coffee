@@ -9,6 +9,8 @@
 #   hubot video stop - Stops the video and clears queue
 #   hubot video next - Stops current video and shows next from the queue
 #   hubot video pause - Pauses current video
+#   hubot video mute - Mutes current video
+#   hubot video unmute - Removes mute current video
 util = require 'util'
 
 
