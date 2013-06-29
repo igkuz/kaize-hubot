@@ -10,6 +10,7 @@
 util = require 'util'
 
 module.exports = (robot) ->
+  robot.follow_http = require('follow-redirects').http
 
   unless process.env.HUBOT_CI_URL?
     robot.logger.error "The HUBOT_CI_URL must be specified"
@@ -48,18 +49,36 @@ module.exports = (robot) ->
         c: 'search'
       )
       .get() (err, res, body) ->
-        tracks = body.match(/("([^"]+download=download.mp3)+")/i)
+        tracks = body.match(/([^"]+download=download.mp3+)/ig)
 
-        if !tracks
-          msg.send "Song not found"
+        test_poiskm_tracks(tracks, msg, 0, callback)
+
+
+  test_poiskm_tracks = (tracks, msg, position, callback) ->
+    msg.send "Test #{position}"
+
+    if !tracks || !tracks[position]
+      msg.send "Song not found"
+      return
+
+    track = tracks[position]
+    song_url = track.replace(/download=download/, 'download')
+    song_url = song_url.replace(new RegExp(song_url[6], 'g'), '/')
+
+    msg.send song_url
+
+    test_url = (song_url, msg, callback) ->
+      robot.http(song_url).head() (err, res, body) ->
+        if res.headers && res.headers.location
+          test_url(res.headers.location, msg, callback)
           return
 
-        track = tracks[2]
-
-        song_url = track.replace(/download=download/, 'download')
-        song_url = song_url.replace(new RegExp(song_url[6], 'g'), '/')
-        callback(song_url, msg)
-
+        if res.statusCode != 200
+          msg.send "Song not found, but I'm continue search"
+          test_poiskm_tracks(tracks, msg, position+1, callback)
+        else
+          callback(song_url, msg)
+    test_url(song_url, msg, callback)
 
   play = (query, msg) ->
     song_url = find_track_in_poiskm(query, msg, play_by_url)
