@@ -7,6 +7,7 @@
 #   hubot player pause - Pause the player
 #   hubot player resume - Resume the player
 #   hubot player volume <query> - Set volume from 0 to 1 (ex. 0.75)
+#   hubot player next  - Play next song if exist
 util = require 'util'
 
 module.exports = (robot) ->
@@ -132,6 +133,15 @@ module.exports = (robot) ->
         else
           msg.send util.inspect res.statusCode, res.headers
 
+  next = (msg) ->
+    robot.http(global.backend_url + "/player/next")
+      .get() (err, res, body) ->
+        status = res.statusCode
+        if status == 200
+          msg.send "Next song"
+        else
+          msg.send util.inspect res.statusCode, res.headers
+
 
   robot.respond /play me (.*)/i, (msg) ->
     query = msg.match[1]
@@ -149,3 +159,6 @@ module.exports = (robot) ->
 
   robot.respond /player resume/i, (msg) ->
     resume msg
+
+  robot.respond /player next/i, (msg) ->
+    next msg
