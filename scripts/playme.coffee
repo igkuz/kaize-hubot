@@ -3,6 +3,10 @@
 #
 # Commands:
 #   hubot play me <query> - Searches Song for the query and play it
+#   hubot player stop - Stop the player
+#   hubot player pause - Pause the player
+#   hubot player resume - Resume the player
+#   hubot player volume <query> - Set volume from 0 to 1 (ex. 0.75)
 util = require 'util'
 
 module.exports = (robot) ->
@@ -87,6 +91,34 @@ module.exports = (robot) ->
         else
           msg.send util.inspect res.statusCode, res.headers
 
+  volume = (value, msg) ->
+    robot.http(global.backend_url + "/player/volume")
+      .query({value: value})
+      .get() (err, res, body) ->
+        status = res.statusCode
+        if status == 200
+          msg.send "Volume set to #{value}"
+        else
+          msg.send util.inspect res.statusCode, res.headers
+
+  pause = (msg) ->
+    robot.http(global.backend_url + "/player/pause")
+      .get() (err, res, body) ->
+        status = res.statusCode
+        if status == 200
+          msg.send "Player set to pause"
+        else
+          msg.send util.inspect res.statusCode, res.headers
+
+  resume = (msg) ->
+    robot.http(global.backend_url + "/player/resume")
+      .get() (err, res, body) ->
+        status = res.statusCode
+        if status == 200
+          msg.send "Player resume play"
+        else
+          msg.send util.inspect res.statusCode, res.headers
+
 
   robot.respond /play me (.*)/i, (msg) ->
     query = msg.match[1]
@@ -94,3 +126,13 @@ module.exports = (robot) ->
 
   robot.respond /player stop/i, (msg) ->
     stop msg
+
+  robot.respond /player volume (.*)/i, (msg) ->
+    value = msg.match[1]
+    volume value, msg
+
+  robot.respond /player pause/i, (msg) ->
+    pause msg
+
+  robot.respond /player resume/i, (msg) ->
+    resume msg
