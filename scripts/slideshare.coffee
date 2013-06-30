@@ -13,7 +13,7 @@
 Util = require 'util'
 
 module.exports = (robot) ->
-  robot.respond /slideshare (show|hide)/i, (msg) ->
+  robot.respond /slideshare (show|hide|next)/i, (msg) ->
 
     unless process.env.HUBOT_CI_URL?
       robot.logger.error "The HUBOT_CI_URL must be specified"
@@ -26,5 +26,22 @@ module.exports = (robot) ->
         status = res.statusCode
         if status == 200
           msg.send "Slideshare #{msg.match[1]} presentation"
+        else
+          msg.send util.inspect res.statusCode, res.headers
+
+  robot.respond /slideshare (jump) slide (.*)/i, (msg) ->
+
+    unless process.env.HUBOT_CI_URL?
+      robot.logger.error "The HUBOT_CI_URL must be specified"
+      return
+    else
+      url = 'http://' + process.env.HUBOT_CI_URL + '/api/slideshare/' + msg.match[1]
+
+    msg.http(url)
+      .query(slide: msg.match[2])
+      .get() (err, res, body) ->
+        status = res.statusCode
+        if status == 200
+          msg.send "Slideshare #{msg.match[1]}ed to slide #{msg.match[2]}"
         else
           msg.send util.inspect res.statusCode, res.headers
