@@ -49,7 +49,7 @@ imageMe = (msg, query, animated, faces, cb) ->
   q = v: '1.0', rsz: '8', q: query, safe: 'active'
   q.imgtype = 'animated' if typeof animated is 'boolean' and animated is true
   q.imgtype = 'face' if typeof faces is 'boolean' and faces is true
-  robot.http('http://ajax.googleapis.com/ajax/services/search/images')
+  msg.http('http://ajax.googleapis.com/ajax/services/search/images')
     .query(q)
     .get() (err, res, body) ->
       images = JSON.parse(body)
