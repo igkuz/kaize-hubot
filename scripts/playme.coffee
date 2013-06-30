@@ -48,6 +48,7 @@ module.exports = (robot) ->
         c: 'search'
       )
       .get() (err, res, body) ->
+        @body = body
         tracks = body.match(/([^"]+download=download.mp3+)/ig)
 
         test_poiskm_tracks(tracks, msg, 0, callback)
@@ -61,6 +62,7 @@ module.exports = (robot) ->
     track = tracks[position]
     song_url = track.replace(/download=download/, 'download')
     song_url = song_url.replace(new RegExp(song_url[6], 'g'), '/')
+    @song_url = song_url
 
     test_url = (song_url, msg, callback) ->
       robot.http(song_url).head() (err, res, body) ->
@@ -72,8 +74,19 @@ module.exports = (robot) ->
           msg.send "Song not found, but I'm continue search"
           test_poiskm_tracks(tracks, msg, position+1, callback)
         else
-          callback(song_url, msg)
+          title = find_title(msg)
+          callback(song_url, title, msg)
     test_url(song_url, msg, callback)
+
+  find_title = (msg) ->
+    id = @song_url.match(/strack\/([^\/]+)/i)
+    return null if !id
+
+    id = id[1]
+    regexp = new RegExp("id=\"track-#{id}\"[\\w\\W]+class=\"songnamebar\"><b>(.*)</b>.*?<a [^>]+>([^<]+)</a>[\\w\\W]+?</li>", "im")
+    result = @body.match(regexp)
+    if result
+      return title = "#{result[1]} - #{result[2]}"
 
   play = (query, msg) ->
     song_url = find_track_in_poiskm(query, msg, play_by_url)
@@ -82,13 +95,13 @@ module.exports = (robot) ->
       #song_url = find_track_in_trackflow(query, msg, play_by_url)
 
 
-  play_by_url = (song_url, msg) ->
+  play_by_url = (song_url, title, msg) ->
     if !song_url
       msg.send "Song not found"
       return
 
     robot.http(global.backend_url + "/player/play")
-      .query({url: song_url})
+      .query({url: song_url, title: title})
       .get() (err, res, body) ->
         status = res.statusCode
         if status == 200
