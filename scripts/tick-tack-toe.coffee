@@ -21,8 +21,6 @@ module.exports = (robot) ->
     else
       url = 'http://' + process.env.HUBOT_CI_URL + '/api/tick-tack-toe/' + msg.match[1]
 
-    msg.send Util.inspect msg.match
-
     msg.http(url)
       .get() (err, res, body) ->
         status = res.statusCode
@@ -38,8 +36,6 @@ module.exports = (robot) ->
       return
     else
       url = 'http://' + process.env.HUBOT_CI_URL + '/api/tick-tack-toe/' + msg.match[1]
-
-    msg.send Util.inspect msg.match
 
     msg.http(url)
       .query(x: msg.match[2], y: msg.match[3])
