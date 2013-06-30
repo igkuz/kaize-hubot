@@ -83,10 +83,14 @@ module.exports = (robot) ->
     return null if !id
 
     id = id[1]
-    regexp = new RegExp("id=\"track-#{id}\"[\\w\\W]+class=\"songnamebar\"><b>(.*)</b>.*?<a [^>]+>([^<]+)</a>[\\w\\W]+?</li>", "im")
-    result = @body.match(regexp)
-    if result
-      return title = "#{result[1]} – #{result[2]}"
+    regexp = new RegExp("id=\"track-#{id}\"[\\w\\W]+class=\"songnamebar\"><b>(.*)</b>.*?<a [^>]+>([^<]+)</a>[\\w\\W]+", "im")
+    regexp_li = new RegExp("(<li id=\"track-#{id}\"[\\w\\W]+?</li>)", "im")
+    li = @body.match(regexp_li)
+    if li
+      result = li[1].match(regexp)
+      if result
+        title = "#{result[1]} – #{result[2]}"
+        return title
 
   play = (query, msg) ->
     song_url = find_track_in_poiskm(query, msg, play_by_url)
