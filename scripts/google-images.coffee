@@ -22,10 +22,26 @@ module.exports = (robot) ->
     imagery = msg.match[1]
 
     if imagery.match /^https?:\/\//i
-      msg.send "#{mustachify}#{imagery}"
+      show_pic "#{mustachify}#{imagery}", msg
     else
       imageMe msg, imagery, false, true, (url) ->
-        msg.send "#{mustachify}#{url}"
+        show_pic "#{mustachify}#{url}", msg
+
+  show_pic = (url, msg) ->
+    unless process.env.HUBOT_CI_URL?
+      robot.logger.error "The HUBOT_CI_URL must be specified"
+      return
+    else
+      backend_url = 'http://' + process.env.HUBOT_CI_URL + '/api/pic/show'
+
+    msg.http(backend_url)
+      .query({url: url})
+      .get() (err, res, body) ->
+        status = res.statusCode
+        if status == 200
+          msg.send "Opening picture from #{url}"
+        else
+          msg.send util.inspect res.statusCode, res.headers
 
 imageMe = (msg, query, animated, faces, cb) ->
   cb = animated if typeof animated == 'function'
@@ -33,7 +49,7 @@ imageMe = (msg, query, animated, faces, cb) ->
   q = v: '1.0', rsz: '8', q: query, safe: 'active'
   q.imgtype = 'animated' if typeof animated is 'boolean' and animated is true
   q.imgtype = 'face' if typeof faces is 'boolean' and faces is true
-  msg.http('http://ajax.googleapis.com/ajax/services/search/images')
+  robot.http('http://ajax.googleapis.com/ajax/services/search/images')
     .query(q)
     .get() (err, res, body) ->
       images = JSON.parse(body)
