@@ -8,8 +8,8 @@
 #   HUBOT_CI_URL - Url for CI
 #
 # Commands:
-#   hubot tick-tack restart - Display slideshare presentation
-#   hubot tick-tack hit <x> <y> - Hide slideshare presentation
+#   hubot tick-tack restart - Restart tick-tack-toe game on CI
+#   hubot tick-tack hit <x> <y> - Hit the field with coordinates x and y
 Util = require 'util'
 
 module.exports = (robot) ->
