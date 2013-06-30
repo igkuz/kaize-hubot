@@ -51,7 +51,7 @@ module.exports = (robot) ->
         @body = body
         tracks = body.match(/([^"]+download=download.mp3+)/ig)
 
-        test_poiskm_tracks(tracks.reverse(), msg, 0, callback)
+        test_poiskm_tracks(tracks, msg, 0, callback)
 
 
   test_poiskm_tracks = (tracks, msg, position, callback) ->
